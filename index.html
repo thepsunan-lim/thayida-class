@@ -274,7 +274,7 @@
         window.db = db;
         window.fb = { collection, addDoc, getDocs, deleteDoc, doc, setDoc };
     </script>
-
+    
     <script>
         function gradeSystem() {
             return {
@@ -299,7 +299,9 @@
                 ],
 
                 init() {
-                    this.loadStudents();
+                    setTimeout(() => {
+                        this.loadStudents();
+                    }, 300);
                 },
 
                 loginTeacher() {
