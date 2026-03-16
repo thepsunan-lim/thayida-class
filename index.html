@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบผลการเรียน ป.6 | โรงเรียนนิคมลำนารายณ์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f0f7ff; }
+        .navy-bg { background-color: #1e3a8a; } /* Navy Blue */
+        .light-blue-bg { background-color: #e0f2fe; } /* Light Blue */
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body x-data="gradeSystem()" x-init="init()" class="min-h-screen text-slate-800">
+
+    <template x-if="view === 'home'">
+        <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+            <img src="https://img2.pic.in.th/IMG_06965cb6b6f9c49059c8.jpeg" alt="Logo" class="w-32 h-32 mb-6 rounded-full shadow-lg border-4 border-white bg-white">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-2">ระบบดูผลการเรียนออนไลน์</h1>
+            <h2 class="text-xl md:text-2xl font-semibold text-blue-700 mb-4">นักเรียนชั้นประถมศึกษาปีที่ 6 ปีการศึกษา 2568</h2>
+            <p class="text-slate-500 mb-10 max-w-lg">โรงเรียนนิคมลำนารายณ์<br>ระบบสำหรับครูบันทึกผลการเรียน และนักเรียนตรวจสอบผลการเรียนของตนเอง</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-lg">
+                <button @click="view = 'login-teacher'" class="p-8 navy-bg hover:bg-blue-800 text-white rounded-3xl shadow-xl transition-all transform hover:scale-105 font-bold text-xl">
+                    <span class="block text-4xl mb-2">🔵</span> เข้าสู่ระบบครู
+                </button>
+                <button @click="view = 'login-student'" class="p-8 bg-green-600 hover:bg-green-700 text-white rounded-3xl shadow-xl transition-all transform hover:scale-105 font-bold text-xl">
+                    <span class="block text-4xl mb-2">🟢</span> เข้าสู่ระบบนักเรียน
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="view === 'login-teacher'">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border-t-8 border-blue-900">
+                <h2 class="text-2xl font-bold text-blue-900 mb-6 text-center">สำหรับคุณครู</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-600">Username</label>
+                        <input type="text" x-model="auth.user" class="w-full border-2 border-slate-100 rounded-xl p-3 outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-600">Password</label>
+                        <input type="password" x-model="auth.pass" class="w-full border-2 border-slate-100 rounded-xl p-3 outline-none focus:border-blue-500">
+                    </div>
+                    <button @click="loginTeacher()" class="w-full navy-bg text-white py-3 rounded-xl font-bold hover:bg-blue-800 shadow-lg">เข้าสู่ระบบ</button>
+                    <button @click="view = 'home'" class="w-full text-slate-400 text-sm">ย้อนกลับ</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="view === 'teacher-dashboard'">
+        <div class="max-w-6xl mx-auto p-4 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-3xl shadow-sm">
+                <div class="flex items-center gap-4">
+                    <img src="https://img2.pic.in.th/IMG_06965cb6b6f9c49059c8.jpeg" class="w-12 h-12 rounded-full">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-900">แผงควบคุมคุณครู ป.6</h2>
+                        <p class="text-slate-400 text-sm">โรงเรียนนิคมลำนารายณ์</p>
+                    </div>
+                </div>
+                <button @click="logout()" class="bg-red-50 text-red-500 px-6 py-2 rounded-xl font-bold hover:bg-red-100 border border-red-100">ออกจากระบบ</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <button @click="openModal('add')" class="p-6 bg-white rounded-3xl shadow-md border-b-4 border-blue-500 hover:bg-blue-50 transition-colors">
+                    <span class="text-2xl">➕</span> <span class="font-bold text-lg block mt-1">เพิ่มรายชื่อนักเรียน</span>
+                </button>
+                <div class="p-6 bg-white rounded-3xl shadow-md border-b-4 border-green-500">
+                    <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">นักเรียนทั้งหมด</span>
+                    <span class="text-3xl font-bold block text-blue-900" x-text="students.length + ' คน'"></span>
+                </div>
+                <div class="p-6 bg-white rounded-3xl shadow-md border-b-4 border-indigo-500">
+                    <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">ปีการศึกษา</span>
+                    <span class="text-3xl font-bold block text-blue-900">2568</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-blue-900 font-bold uppercase text-sm">
+                            <tr>
+                                <th class="p-5">เลขที่</th>
+                                <th class="p-5">รหัสประจำตัว</th>
+                                <th class="p-5">ชื่อ-นามสกุล</th>
+                                <th class="p-5 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <template x-for="(st, index) in students" :key="st.id">
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="p-5 font-medium" x-text="st.no"></td>
+                                    <td class="p-5 text-slate-500" x-text="st.id"></td>
+                                    <td class="p-5 font-bold text-blue-800" x-text="st.name"></td>
+                                    <td class="p-5 text-center space-x-2">
+                                        <button @click="editGrades(st)" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg font-bold shadow-sm hover:bg-blue-700">กรอกผลการเรียน</button>
+                                        <button @click="deleteStudent(index)" class="text-red-400 hover:text-red-600 font-bold p-2">ลบ</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <template x-if="students.length === 0">
+                    <div class="p-20 text-center text-slate-300 italic">ยังไม่มีข้อมูลนักเรียนในระบบ</div>
+                </template>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="showModal" x-cloak>
+        <div class="fixed inset-0 bg-blue-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-[2rem] w-full max-w-5xl max-h-[90vh] overflow-y-auto p-6 md:p-10 shadow-2xl border-4 border-white">
+                <div class="flex justify-between items-center mb-8 border-b border-slate-100 pb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-blue-900">บันทึกผลการเรียนรายบุคคล</h3>
+                        <p class="text-slate-400 text-sm">กรุณาระบุคะแนนให้ครบถ้วนเพื่อคำนวณเกรดอัตโนมัติ</p>
+                    </div>
+                    <button @click="showModal = false" class="text-4xl text-slate-300 hover:text-red-500">&times;</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 bg-blue-50/50 p-6 rounded-3xl border border-blue-100">
+                    <div>
+                        <label class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">เลขที่</label>
+                        <input type="number" x-model="currentStudent.no" class="w-full p-3 border-2 border-white rounded-2xl outline-none focus:border-blue-400 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">รหัสประจำตัว</label>
+                        <input type="text" x-model="currentStudent.id" class="w-full p-3 border-2 border-white rounded-2xl outline-none focus:border-blue-400 shadow-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">ชื่อ-นามสกุล</label>
+                        <input type="text" x-model="currentStudent.name" class="w-full p-3 border-2 border-white rounded-2xl outline-none focus:border-blue-400 shadow-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="subj in subjects" :key="subj.key">
+                        <div class="p-5 border-2 border-slate-50 rounded-3xl bg-white shadow-sm hover:border-blue-200 transition-colors">
+                            <h4 class="font-bold text-blue-900 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full navy-bg"></span>
+                                <span x-text="subj.name"></span>
+                            </h4>
+                            <div class="flex gap-3 mb-3">
+                                <div class="flex-1">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">คะแนนเก็บ</label>
+                                    <input type="number" x-model.number="currentStudent.scores[subj.key].collect" @input="calc(subj.key)" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-center font-bold focus:bg-white outline-none">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">คะแนนสอบ</label>
+                                    <input type="number" x-model.number="currentStudent.scores[subj.key].exam" @input="calc(subj.key)" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-center font-bold focus:bg-white outline-none">
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center navy-bg text-white p-3 rounded-2xl shadow-inner">
+                                <span class="text-xs font-medium opacity-80">รวม: <span class="text-base font-bold opacity-100" x-text="currentStudent.scores[subj.key].total"></span></span>
+                                <span class="bg-white text-blue-900 px-3 py-1 rounded-lg text-sm font-black shadow-sm">เกรด: <span x-text="currentStudent.scores[subj.key].grade"></span></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="mt-12 flex flex-col md:flex-row gap-4 sticky bottom-0 bg-white pt-6 border-t border-slate-50">
+                    <button @click="save()" class="flex-1 navy-bg text-white py-4 rounded-2xl font-bold shadow-xl text-lg hover:bg-blue-800 transition-all">💾 บันทึกข้อมูลผลการเรียน</button>
+                    <button @click="showModal = false" class="md:w-1/3 bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold hover:bg-slate-200">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="view === 'login-student'">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border-t-8 border-green-600 text-center">
+                <img src="https://img2.pic.in.th/IMG_06965cb6b6f9c49059c8.jpeg" alt="Logo" class="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-slate-50 shadow-md">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">ตรวจสอบผลการเรียน</h2>
+                <p class="text-slate-400 text-sm mb-8 uppercase tracking-widest">ชั้นประถมศึกษาปีที่ 6</p>
+                <div class="space-y-6">
+                    <div class="text-left">
+                        <label class="block text-xs font-bold mb-2 text-slate-400 uppercase text-center tracking-widest">ระบุรหัสประจำตัวนักเรียน</label>
+                        <input type="text" x-model="searchId" class="w-full border-2 border-slate-100 rounded-2xl p-5 text-center text-3xl font-bold text-blue-700 outline-none focus:border-green-400 shadow-inner bg-slate-50">
+                    </div>
+                    <button @click="loginStudent()" class="w-full bg-green-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg hover:bg-green-700 transition-all active:scale-95">ค้นหาข้อมูล</button>
+                    <button @click="view = 'home'" class="w-full text-slate-400 font-medium">ย้อนกลับหน้าหลัก</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="view === 'student-report'">
+        <div class="max-w-4xl mx-auto p-4 md:p-10">
+            <div class="bg-white rounded-[3rem] shadow-2xl overflow-hidden border-t-[16px] border-blue-900 p-8 md:p-16 relative">
+                <div class="text-center mb-12">
+                    <img src="https://img2.pic.in.th/IMG_06965cb6b6f9c49059c8.jpeg" class="w-24 mx-auto mb-6">
+                    <h2 class="text-2xl md:text-4xl font-bold text-blue-900 mb-2">ใบแจ้งผลการเรียนรายบุคคล</h2>
+                    <p class="text-slate-400 font-medium uppercase tracking-widest">โรงเรียนนิคมลำนารายณ์ ปีการศึกษา 2568</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 bg-slate-50 p-8 rounded-[2rem] border-2 border-white shadow-inner">
+                    <p class="text-lg text-blue-900"><strong>ชื่อ-สกุล:</strong> <span class="font-bold" x-text="targetStudent.name"></span></p>
+                    <p class="text-lg text-blue-900"><strong>ชั้นเรียน:</strong> ประถมศึกษาปีที่ 6</p>
+                    <p class="text-lg text-blue-900"><strong>รหัสประจำตัว:</strong> <span class="font-bold" x-text="targetStudent.id"></span></p>
+                    <p class="text-lg text-blue-900"><strong>เลขที่:</strong> <span class="font-bold" x-text="targetStudent.no"></span></p>
+                </div>
+
+                <div class="overflow-x-auto mb-12 border rounded-[2rem] shadow-sm">
+                    <table class="w-full text-center border-collapse">
+                        <thead class="navy-bg text-white">
+                            <tr>
+                                <th class="p-4 text-left pl-8">รายวิชา</th>
+                                <th class="p-4">คะแนนเก็บ</th>
+                                <th class="p-4">คะแนนสอบ</th>
+                                <th class="p-4">รวม</th>
+                                <th class="p-4 pr-8">เกรด</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <template x-for="subj in subjects" :key="subj.key">
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="p-4 text-left pl-8 font-bold text-blue-900" x-text="subj.name"></td>
+                                    <td class="p-4 text-slate-500" x-text="targetStudent.scores[subj.key].collect"></td>
+                                    <td class="p-4 text-slate-500" x-text="targetStudent.scores[subj.key].exam"></td>
+                                    <td class="p-4 font-bold text-slate-700" x-text="targetStudent.scores[subj.key].total"></td>
+                                    <td class="p-4 pr-8 font-black text-blue-700 text-2xl" x-text="targetStudent.scores[subj.key].grade"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-10 navy-bg rounded-[2.5rem] text-white shadow-2xl">
+                    <div class="text-center md:text-left">
+                        <p class="text-blue-300 font-bold mb-1 uppercase tracking-widest text-sm opacity-80">เกรดเฉลี่ยสะสม (GPA)</p>
+                        <span class="text-7xl font-black" x-text="calculateGPA(targetStudent)"></span>
+                    </div>
+                    <div class="text-center md:text-right flex flex-col items-center md:items-end">
+                        <p class="text-blue-200 text-sm mb-3 opacity-80">ผลการประเมินสถานะ</p>
+                        <span :class="parseFloat(calculateGPA(targetStudent)) >= 1 ? 'bg-green-500 shadow-green-900/20' : 'bg-red-500 shadow-red-900/20'" 
+                              class="px-12 py-4 rounded-2xl font-black text-2xl shadow-xl border-2 border-white/20" 
+                              x-text="parseFloat(calculateGPA(targetStudent)) >= 1 ? '✅ ผ่านเกณฑ์' : '❌ ไม่ผ่านเกณฑ์'">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 mt-12 no-print">
+                    <button onclick="window.print()" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-200">🖨️ พิมพ์ผลการเรียน (PDF)</button>
+                    <button @click="view = 'home'" class="flex-1 navy-bg text-white py-4 rounded-2xl font-bold hover:bg-blue-800 shadow-lg">🚪 ออกจากระบบ</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBEBjCcd8-RxkuzqyJ6c3BdcknRyMjyE08",
+            authDomain: "thayidaclass.firebaseapp.com",
+            projectId: "thayidaclass",
+            storageBucket: "thayidaclass.firebasestorage.app",
+            messagingSenderId: "767577042640",
+            appId: "1:767577042640:web:839d4248fa05673729f8d5",
+            measurementId: "G-3M5EED3WK1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.fb = { collection, addDoc, getDocs, deleteDoc, doc, setDoc };
+    </script>
+
+    <script>
+        function gradeSystem() {
+            return {
+                view: 'home',
+                auth: { user: '', pass: '' },
+                searchId: '',
+                showModal: false,
+                students: [],
+                currentStudent: null,
+                targetStudent: null,
+                subjects: [
+                    { name: 'ภาษาไทย', key: 'th' },
+                    { name: 'คณิตศาสตร์', key: 'math' },
+                    { name: 'วิทยาศาสตร์', key: 'sci' },
+                    { name: 'ภาษาอังกฤษ', key: 'en' },
+                    { name: 'สังคมศึกษา', key: 'soc' },
+                    { name: 'ประวัติศาสตร์', key: 'hist' },
+                    { name: 'การงานอาชีพ', key: 'job' },
+                    { name: 'ศิลปะ', key: 'art' },
+                    { name: 'สุขศึกษาและพลศึกษา', key: 'pe' },
+                    { name: 'หน้าที่พลเมือง', key: 'civic' }
+                ],
+
+                init() {
+                    this.loadStudents();
+                },
+
+                loginTeacher() {
+                    if(this.auth.user === 'teacher' && this.auth.pass === 'Kru1234') {
+                        this.view = 'teacher-dashboard';
+                    } else {
+                        alert('ขออภัย! ข้อมูลผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+                    }
+                },
+
+                loginStudent() {
+                    const found = this.students.find(s => s.id === this.searchId);
+                    if(found) {
+                        this.targetStudent = found;
+                        this.view = 'student-report';
+                    } else {
+                        alert('❌ ไม่พบข้อมูล: กรุณาตรวจสอบรหัสประจำตัวนักเรียนอีกครั้ง');
+                    }
+                },
+
+                openModal(mode) {
+                    let baseScores = {};
+                    this.subjects.forEach(s => baseScores[s.key] = { collect: 0, exam: 0, total: 0, grade: '0' });
+                    this.currentStudent = { no: this.students.length + 1, id: '', name: '', class: 'ป.6', scores: baseScores };
+                    this.showModal = true;
+                },
+
+                editGrades(st) {
+                    this.currentStudent = JSON.parse(JSON.stringify(st));
+                    this.showModal = true;
+                },
+
+                calc(key) {
+                    let s = this.currentStudent.scores[key];
+                    s.total = (Number(s.collect) || 0) + (Number(s.exam) || 0);
+                    const t = s.total;
+                    if (t >= 80) s.grade = '4';
+                    else if (t >= 75) s.grade = '3.5';
+                    else if (t >= 70) s.grade = '3';
+                    else if (t >= 65) s.grade = '2.5';
+                    else if (t >= 60) s.grade = '2';
+                    else if (t >= 55) s.grade = '1.5';
+                    else if (t >= 50) s.grade = '1';
+                    else s.grade = '0';
+                },
+
+                async save() {
+                    if(!this.currentStudent.id || !this.currentStudent.name) {
+                        return alert('กรุณากรอกรหัสประจำตัวและชื่อ-นามสกุล');
+                    }
+
+                    try {
+
+                        let docId = this.currentStudent._docId || this.currentStudent.id;
+
+                        const docRef = fb.doc(db, "students", docId);
+
+                        let cleanData = {...this.currentStudent};
+                        delete cleanData._docId;
+
+                        await fb.setDoc(docRef, cleanData);
+
+                        await this.loadStudents();
+
+                        this.showModal = false;
+
+                        alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+
+                    } catch(e) {
+                        alert("เกิดข้อผิดพลาดในการบันทึก");
+                        console.error(e);
+                    }
+                },
+
+                async deleteStudent(idx) {
+                    const student = this.students[idx];
+
+                    if(confirm('คุณครูแน่ใจใช่ไหมที่จะลบข้อมูลนักเรียนรายนี้?')) {
+
+                        await fb.deleteDoc(fb.doc(db, "students", student._docId));
+
+                        await this.loadStudents();
+                    }
+                },
+
+                calculateGPA(st) {
+                    let sum = 0;
+                    this.subjects.forEach(s => {
+                        sum += parseFloat(st.scores?.[s.key]?.grade || 0);
+                    });
+                    return (sum / this.subjects.length).toFixed(2);
+                },
+
+                logout() {
+                    this.view = 'home';
+                    this.auth = { user: '', pass: '' };
+                },
+
+                async loadStudents() {
+                    const querySnapshot = await fb.getDocs(fb.collection(db, "students"));
+                    this.students = [];
+                    querySnapshot.forEach((docSnap) => {
+                        let data = docSnap.data();
+                        data._docId = docSnap.id;
+                        this.students.push(data);
+                    });
+                    this.students.sort((a,b) => a.no - b.no);
+                },
+            }
+        }
+    </script>
+
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; }
+            .shadow-2xl, .shadow-xl, .shadow-lg { shadow: none !important; }
+            .rounded-\[3rem\] { border-radius: 0 !important; }
+        }
+    </style>
+</body>
+</html>
