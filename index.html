@@ -405,6 +405,17 @@
                     this.students = [];
                     querySnapshot.forEach((docSnap) => {
                         let data = docSnap.data();
+
+                        if (!data.scores) {
+                            data.scores = {};
+                        }
+
+                        this.subjects.forEach(s => {
+                            if (!data.scores[s.key]) {
+                                data.scores[s.key] = { collect: 0, exam: 0, total: 0, grade: "0" };
+                            }
+                        });
+
                         data._docId = docSnap.id;
                         this.students.push(data);
                     });
