@@ -304,11 +304,32 @@
                     }, 300);
                 },
 
-                loginTeacher() {
-                    if(this.auth.user === 'teacher' && this.auth.pass === 'Kru1234') {
-                        this.view = 'teacher-dashboard';
-                    } else {
-                        alert('ขออภัย! ข้อมูลผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+                async loginTeacher() {
+                    try {
+                        const querySnapshot = await fb.getDocs(fb.collection(db, "teachers"));
+
+                        let found = false;
+
+                        querySnapshot.forEach((docSnap) => {
+                            const data = docSnap.data();
+
+                            if (
+                                data.name === this.auth.user &&
+                                data.password === this.auth.pass
+                            ) {
+                                found = true;
+                            }
+                        });
+
+                        if (found) {
+                            this.view = 'teacher-dashboard';
+                        } else {
+                            alert('❌ Username หรือ Password ไม่ถูกต้อง');
+                        }
+
+                    } catch (e) {
+                        console.error(e);
+                        alert("เกิดข้อผิดพลาด");
                     }
                 },
 
