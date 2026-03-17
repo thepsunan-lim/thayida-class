@@ -304,7 +304,7 @@
                 ],
 
                 init() {
-                    authFns.onAuthStateChanged(auth, (user) => {
+                    window.authFns.onAuthStateChanged(auth, (user) => {
                         if (user) {
                             this.view = 'teacher-dashboard';
                         }
@@ -317,7 +317,7 @@
                     try {
                         const email = this.auth.user + "@lnr.com";
 
-                        await authFns.signInWithEmailAndPassword(
+                        await window.authFns.signInWithEmailAndPassword(
                             auth,
                             email,
                             this.auth.pass
@@ -415,7 +415,7 @@
                 },
 
                 async logout() {
-                    await authFns.signOut(auth);
+                    await window.authFns.signOut(auth);
                     this.view = 'home';
                     this.auth = { user: '', pass: '' };
                 },
