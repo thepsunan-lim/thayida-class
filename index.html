@@ -335,6 +335,10 @@
                     try {
                         const email = this.auth.user + "@lnr.com";
 
+                        // 🔥 Force sign out first (clears old persistence)
+                        await window.authFns.signOut(window.auth);
+
+                        // ✅ Set session-only persistence
                         await window.authFns.setPersistence(
                             window.auth,
                             window.authFns.browserSessionPersistence
