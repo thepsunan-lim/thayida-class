@@ -257,7 +257,14 @@
    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut,
+            setPersistence,
+            browserSessionPersistence
+        } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBEBjCcd8-RxkuzqyJ6c3BdcknRyMjyE08",
@@ -276,7 +283,13 @@
 
         const auth = getAuth(app);
         window.auth = auth;
-        window.authFns = { signInWithEmailAndPassword, onAuthStateChanged, signOut };
+        window.authFns = { 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut,
+            setPersistence,
+            browserSessionPersistence
+        };
 
     </script>
     
@@ -321,6 +334,11 @@
                 async loginTeacher() {
                     try {
                         const email = this.auth.user + "@lnr.com";
+
+                        await window.authFns.setPersistence(
+                            window.auth,
+                            window.authFns.browserSessionPersistence
+                        );
 
                         await window.authFns.signInWithEmailAndPassword(
                             window.auth,
