@@ -256,7 +256,7 @@
 
    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -272,7 +272,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         window.db = db;
-        window.fb = { collection, addDoc, getDocs, deleteDoc, doc, setDoc };
+        window.fb = { collection, addDoc, getDocs, getDoc, deleteDoc, doc, setDoc };
 
         const auth = getAuth(app);
         window.auth = auth;
@@ -308,15 +308,14 @@
                         if (window.authFns && window.auth) {
                             clearInterval(waitForAuth);
 
-                            window.authFns.onAuthStateChanged(window.auth, (user) => {
+                            window.authFns.onAuthStateChanged(window.auth, async (user) => {
                                 if (user) {
                                     this.view = 'teacher-dashboard';
+                                    await this.loadStudents(); // ✅ only teacher loads data
                                 }
                             });
                         }
                     }, 100);
-
-                    this.loadStudents();
                 },
 
                 async loginTeacher() {
@@ -337,13 +336,24 @@
                     }
                 },
 
-                loginStudent() {
-                    const found = this.students.find(s => s.id === this.searchId);
-                    if(found) {
-                        this.targetStudent = found;
-                        this.view = 'student-report';
-                    } else {
-                        alert('❌ ไม่พบข้อมูล: กรุณาตรวจสอบรหัสประจำตัวนักเรียนอีกครั้ง');
+                async loginStudent() {
+                    if (!this.searchId) {
+                        return alert("กรุณากรอกรหัสนักเรียน");
+                    }
+                    try {
+                        const docRef = fb.doc(db, "students", this.searchId);
+                        const docSnap = await fb.getDoc(docRef);
+
+                        if (docSnap.exists()) {
+                            this.targetStudent = docSnap.data(); // ✅ get actual data
+                            this.view = 'student-report';
+                        } else {
+                            alert('❌ ไม่พบข้อมูล: กรุณาตรวจสอบรหัสประจำตัวนักเรียนอีกครั้ง');
+                        }
+
+                    } catch (e) {
+                        console.error(e);
+                        alert('❌ เกิดข้อผิดพลาด');
                     }
                 },
 
