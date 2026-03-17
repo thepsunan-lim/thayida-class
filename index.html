@@ -304,11 +304,17 @@
                 ],
 
                 init() {
-                    window.authFns.onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            this.view = 'teacher-dashboard';
+                    const waitForAuth = setInterval(() => {
+                        if (window.authFns && window.auth) {
+                            clearInterval(waitForAuth);
+
+                            window.authFns.onAuthStateChanged(window.auth, (user) => {
+                                if (user) {
+                                    this.view = 'teacher-dashboard';
+                                }
+                            });
                         }
-                    });
+                    }, 100);
 
                     this.loadStudents();
                 },
@@ -318,7 +324,7 @@
                         const email = this.auth.user + "@lnr.com";
 
                         await window.authFns.signInWithEmailAndPassword(
-                            auth,
+                            window.auth,
                             email,
                             this.auth.pass
                         );
@@ -415,7 +421,7 @@
                 },
 
                 async logout() {
-                    await window.authFns.signOut(auth);
+                    await window.authFns.signOut(window.auth);
                     this.view = 'home';
                     this.auth = { user: '', pass: '' };
                 },
