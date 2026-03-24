@@ -611,6 +611,7 @@
             .navy-bg {
                 page-break-inside: avoid;
                 break-inside: avoid;
+                background-color: white !important;
             }
 
             /* ✅ Slight scale (NOT too aggressive) */
@@ -631,16 +632,6 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
 
-            /* force solid backgrounds for print */
-            .bg-blue-900\/60, .bg-blue-50\/50, .bg-slate-50\/50 {
-                background-color: #f0f7ff !important; /* or whatever your main bg color is */
-                backdrop-filter: none !important; /* remove blur */
-            }
-
-            /* any other semi-transparent or blur classes */
-            .backdrop-blur-sm {
-                backdrop-filter: none !important;
-            }
         }
     </style>
 </body>
