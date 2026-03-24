@@ -604,26 +604,28 @@
             .print-container {
                 page-break-inside: avoid;
                 break-inside: avoid;
+                transform: scale(0.94);
+                transform-origin: top left;
             }
 
             /* ✅ Protect bottom GPA block */
-            .navy-bg {
+            /* .navy-bg {
                 page-break-inside: avoid;
                 break-inside: avoid;
-            }
+            } */
 
             /* ✅ Slight scale (NOT too aggressive) */
-            .print-scale {
+            /* .print-scale {
                 zoom: 0.88;
-            }
+            } */
 
             /* ✅ Slight spacing tighten */
-            .mb-6 { margin-bottom: 12px !important; }
-            .p-8 { padding: 16px !important; }
+            .mb-6 { margin-bottom: 1rem !important; }
+            .p-8 { padding: 2rem !important; }
 
-            .grid.md\:grid-cols-2 {
+            /* .grid.md\:grid-cols-2 {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
+            } */
         }
     </style>
 </body>
