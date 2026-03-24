@@ -608,10 +608,10 @@
             }
 
             /* ✅ Protect bottom GPA block */
-            /* .navy-bg {
+            .navy-bg {
                 page-break-inside: avoid;
                 break-inside: avoid;
-            } */
+            }
 
             /* ✅ Slight scale (NOT too aggressive) */
             .print-scale {
@@ -629,6 +629,13 @@
 
             .grid.md\:grid-cols-2 {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            .bg-blue-900, .bg-blue-900\/60 {
+                background-color: #1e3a8a !important; /* solid navy */
+            }
+            .bg-blue-50, .bg-blue-50\/50 {
+                background-color: #e0f2fe !important; /* solid light blue */
             }
 
         }
