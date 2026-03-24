@@ -274,8 +274,19 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-10 navy-bg rounded-[2.5rem] text-white shadow-2xl">
                     <div class="text-center md:text-left">
-                        <p class="text-blue-300 font-bold mb-1 uppercase tracking-widest text-sm opacity-80">เกรดเฉลี่ยสะสม (GPA)</p>
-                        <span class="text-7xl font-black" x-text="calculateGPA(targetStudent)"></span>
+                        <div class="text-center md:text-left">
+                            <p class="text-blue-300 font-bold mb-1 uppercase tracking-widest text-sm opacity-80">
+                                เกรดเฉลี่ยสะสม (GPA)
+                            </p>
+
+                            <div class="flex flex-col">
+                                <span class="text-7xl font-black" x-text="calculateGPA(targetStudent)"></span>
+
+                                <span class="text-lg text-blue-200 mt-2">
+                                    เฉลี่ย <span x-text="(getAverageScore(targetStudent) || 0).toFixed(2)"></span> คะแนน
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="text-center md:text-right flex flex-col items-center md:items-end">
                         <p class="text-blue-200 text-sm mb-3 opacity-80">ผลการประเมินสถานะ</p>
