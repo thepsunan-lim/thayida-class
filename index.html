@@ -104,6 +104,15 @@
                                     </td>
                                 </tr>
                             </template>
+                            <tr class="bg-blue-100 border-t-2 border-blue-300 font-bold text-blue-900">
+                                <td class="p-4 text-left pl-8">รวมเฉลี่ย</td>
+                                <td class="p-4"
+                                    x-text="getAverageScore(targetStudent).toFixed(2)">
+                                </td>
+                                <td class="p-4 pr-8 text-xl"
+                                    x-text="calculateGPA(targetStudent)">
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -236,7 +245,7 @@
                         <p class="text-blue-200 text-sm mb-3 opacity-80">ผลการประเมินสถานะ</p>
                         <span 
                             class="px-12 py-4 rounded-2xl font-black text-2xl shadow-xl border-2 border-white/20 bg-indigo-500"
-                            x-text="'🏆 อันดับที่ ' + getRank(targetStudent) + ' ของห้อง'">
+                            x-text="'🏆 อันดับที่ ' + getRank(targetStudent)">
                         </span>
                     </div>
                 </div>
@@ -479,19 +488,33 @@
                     this.students.sort((a,b) => a.no - b.no);
                 },
 
+                getAverageScore(st) {
+                    let sum = 0;
+
+                    this.subjects.forEach(s => {
+                        sum += Number(st.scores?.[s.key]?.score || 0);
+                    });
+
+                    return sum / this.subjects.length;
+                },
+
                 getRank(target) {
                     if (!this.students.length) return "-";
 
-                    // clone + calculate GPA
                     const ranked = this.students.map(s => ({
                         id: s.id,
-                        gpa: parseFloat(this.calculateGPA(s))
+                        gpa: parseFloat(this.calculateGPA(s)),
+                        avg: this.getAverageScore(s)
                     }));
 
-                    // sort DESC (highest GPA first)
-                    ranked.sort((a, b) => b.gpa - a.gpa);
+                    ranked.sort((a, b) => {
+                        // 🔥 primary: GPA
+                        if (b.gpa !== a.gpa) return b.gpa - a.gpa;
 
-                    // find index
+                        // 🔥 secondary: average score
+                        return b.avg - a.avg;
+                    });
+
                     const index = ranked.findIndex(s => s.id === target.id);
 
                     return index !== -1 ? index + 1 : "-";
