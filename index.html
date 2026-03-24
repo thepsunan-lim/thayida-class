@@ -577,40 +577,79 @@
                 margin: 10mm;
             }
 
-            .no-print { display: none !important; }
-            body { background-color: white; }
-
-            .shadow-2xl, .shadow-xl, .shadow-lg { 
-                box-shadow: none !important; 
+            /* ✅ Force real colors (fix faded look) */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
-            .rounded-\[3rem\] { 
-                border-radius: 0 !important; 
+            body {
+                background: white !important;
+                margin: 0;
             }
 
-            /* 🔥 IMPORTANT: prevent breaking */
+            /* ❌ Hide buttons */
+            .no-print {
+                display: none !important;
+            }
+
+            /* ❌ Remove shadows (clean document look) */
+            .shadow-2xl,
+            .shadow-xl,
+            .shadow-lg {
+                box-shadow: none !important;
+            }
+
+            /* ❌ Remove big rounded corners */
+            .rounded-\[3rem\],
+            .rounded-\[2\.5rem\] {
+                border-radius: 0 !important;
+            }
+
+            /* ✅ Main container fix */
             .print-container {
                 page-break-inside: avoid;
                 break-inside: avoid;
+                margin: 0 auto;
             }
 
+            /* ✅ Proper scaling (NO zoom) */
             .print-scale {
                 transform: scale(0.85);
                 transform-origin: top center;
                 width: 117%;
             }
 
+            /* ✅ Reduce spacing (fit 1 page) */
+            .mb-6 { margin-bottom: 8px !important; }
+            .mb-12 { margin-bottom: 12px !important; }
+
+            .p-4 { padding: 6px !important; }
+            .p-6 { padding: 10px !important; }
+            .p-8 { padding: 14px !important; }
+            .p-10 { padding: 16px !important; }
+
+            /* ✅ Table compact */
+            table th,
+            table td {
+                padding: 8px !important;
+                font-size: 14px !important;
+            }
+
+            /* ✅ GPA size tweak */
+            .text-7xl {
+                font-size: 48px !important;
+            }
+
+            /* ✅ Layout width fix */
             .max-w-4xl {
                 max-width: 100% !important;
             }
 
-            .p-4, .md\:p-10 {
-                padding: 0 !important;
+            /* ✅ Keep your theme color */
+            .navy-bg {
+                background-color: #1e3a8a !important;
             }
-
-            .mb-6 { margin-bottom: 10px !important; }
-            .mb-12 { margin-bottom: 16px !important; }
-            .p-8, .p-10 { padding: 12px !important; }
         }
     </style>
 </body>
