@@ -591,6 +591,7 @@
             }
 
             /* ✅ Keep rounded slightly (don’t kill design) */
+            .rounded-\[2rem\],
             .rounded-\[3rem\] {
                 border-radius: 0 !important;
             }
@@ -621,7 +622,10 @@
             .mb-6 { margin-bottom: 12px !important; }
             .p-8 { padding: 16px !important; }
             .mb-8 { margin-bottom: 16px !important; }
-            .p-4 { padding: 4px !important;}
+            .p-4 { 
+                padding: 4px !important;
+                padding-left: 8px !important;
+            }
 
             .grid.md\:grid-cols-2 {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
