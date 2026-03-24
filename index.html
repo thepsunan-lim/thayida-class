@@ -147,18 +147,17 @@
                                 <span class="w-2 h-2 rounded-full navy-bg"></span>
                                 <span x-text="subj.name"></span>
                             </h4>
-                            <div class="flex gap-3 mb-3">
-                                <div class="flex-1">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase">คะแนนเก็บ</label>
-                                    <input type="number" x-model.number="currentStudent.scores[subj.key].collect" @input="calc(subj.key)" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-center font-bold focus:bg-white outline-none">
-                                </div>
-                                <div class="flex-1">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase">คะแนนสอบ</label>
-                                    <input type="number" x-model.number="currentStudent.scores[subj.key].exam" @input="calc(subj.key)" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-center font-bold focus:bg-white outline-none">
-                                </div>
+                            <div class="mb-3">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">คะแนนรวม</label>
+                                <input 
+                                    type="number" 
+                                    x-model.number="currentStudent.scores[subj.key].score" 
+                                    @input="calc(subj.key)" 
+                                    class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-center font-bold focus:bg-white outline-none"
+                                >
                             </div>
                             <div class="flex justify-between items-center navy-bg text-white p-3 rounded-2xl shadow-inner">
-                                <span class="text-xs font-medium opacity-80">รวม: <span class="text-base font-bold opacity-100" x-text="currentStudent.scores[subj.key].total"></span></span>
+                                <span class="text-xs font-medium opacity-80">รวม: <span class="text-base font-bold opacity-100" x-text="currentStudent.scores[subj.key].score"></span></span>
                                 <span class="bg-white text-blue-900 px-3 py-1 rounded-lg text-sm font-black shadow-sm">เกรด: <span x-text="currentStudent.scores[subj.key].grade"></span></span>
                             </div>
                         </div>
@@ -212,9 +211,7 @@
                         <thead class="navy-bg text-white">
                             <tr>
                                 <th class="p-4 text-left pl-8">รายวิชา</th>
-                                <th class="p-4">คะแนนเก็บ</th>
-                                <th class="p-4">คะแนนสอบ</th>
-                                <th class="p-4">รวม</th>
+                                <th class="p-4">คะแนน</th>
                                 <th class="p-4 pr-8">เกรด</th>
                             </tr>
                         </thead>
@@ -222,9 +219,7 @@
                             <template x-for="subj in subjects" :key="subj.key">
                                 <tr class="hover:bg-blue-50/50 transition-colors">
                                     <td class="p-4 text-left pl-8 font-bold text-blue-900" x-text="subj.name"></td>
-                                    <td class="p-4 text-slate-500" x-text="targetStudent.scores[subj.key].collect"></td>
-                                    <td class="p-4 text-slate-500" x-text="targetStudent.scores[subj.key].exam"></td>
-                                    <td class="p-4 font-bold text-slate-700" x-text="targetStudent.scores[subj.key].total"></td>
+                                    <td class="p-4 text-slate-500" x-text="targetStudent.scores[subj.key].score"></td>
                                     <td class="p-4 pr-8 font-black text-blue-700 text-2xl" x-text="targetStudent.scores[subj.key].grade"></td>
                                 </tr>
                             </template>
@@ -239,9 +234,9 @@
                     </div>
                     <div class="text-center md:text-right flex flex-col items-center md:items-end">
                         <p class="text-blue-200 text-sm mb-3 opacity-80">ผลการประเมินสถานะ</p>
-                        <span :class="parseFloat(calculateGPA(targetStudent)) >= 1 ? 'bg-green-500 shadow-green-900/20' : 'bg-red-500 shadow-red-900/20'" 
-                              class="px-12 py-4 rounded-2xl font-black text-2xl shadow-xl border-2 border-white/20" 
-                              x-text="parseFloat(calculateGPA(targetStudent)) >= 1 ? '✅ ผ่านเกณฑ์' : '❌ ไม่ผ่านเกณฑ์'">
+                        <span 
+                            class="px-12 py-4 rounded-2xl font-black text-2xl shadow-xl border-2 border-white/20 bg-indigo-500"
+                            x-text="'🏆 อันดับที่ ' + getRank(targetStudent) + ' ของห้อง'">
                         </span>
                     </div>
                 </div>
@@ -362,15 +357,18 @@
                     if (!this.searchId) {
                         return alert("กรุณากรอกรหัสนักเรียน");
                     }
+
                     try {
+                        await this.loadStudents(); // 👈 ADD THIS
+
                         const docRef = fb.doc(db, "students", this.searchId);
                         const docSnap = await fb.getDoc(docRef);
 
                         if (docSnap.exists()) {
-                            this.targetStudent = docSnap.data(); // ✅ get actual data
+                            this.targetStudent = docSnap.data();
                             this.view = 'student-report';
                         } else {
-                            alert('❌ ไม่พบข้อมูล: กรุณาตรวจสอบรหัสประจำตัวนักเรียนอีกครั้ง');
+                            alert('❌ ไม่พบข้อมูล');
                         }
 
                     } catch (e) {
@@ -381,7 +379,7 @@
 
                 openModal(mode) {
                     let baseScores = {};
-                    this.subjects.forEach(s => baseScores[s.key] = { collect: 0, exam: 0, total: 0, grade: '0' });
+                    this.subjects.forEach(s => baseScores[s.key] = { score: 0, grade: '0' });
                     this.currentStudent = { no: this.students.length + 1, id: '', name: '', class: 'ป.6', scores: baseScores };
                     this.showModal = true;
                 },
@@ -393,8 +391,9 @@
 
                 calc(key) {
                     let s = this.currentStudent.scores[key];
-                    s.total = (Number(s.collect) || 0) + (Number(s.exam) || 0);
-                    const t = s.total;
+
+                    const t = Number(s.score) || 0;
+
                     if (t >= 80) s.grade = '4';
                     else if (t >= 75) s.grade = '3.5';
                     else if (t >= 70) s.grade = '3';
@@ -470,7 +469,7 @@
 
                         this.subjects.forEach(s => {
                             if (!data.scores[s.key]) {
-                                data.scores[s.key] = { collect: 0, exam: 0, total: 0, grade: "0" };
+                                data.scores[s.key] = { score: 0, grade: "0" };
                             }
                         });
 
@@ -478,6 +477,24 @@
                         this.students.push(data);
                     });
                     this.students.sort((a,b) => a.no - b.no);
+                },
+
+                getRank(target) {
+                    if (!this.students.length) return "-";
+
+                    // clone + calculate GPA
+                    const ranked = this.students.map(s => ({
+                        id: s.id,
+                        gpa: parseFloat(this.calculateGPA(s))
+                    }));
+
+                    // sort DESC (highest GPA first)
+                    ranked.sort((a, b) => b.gpa - a.gpa);
+
+                    // find index
+                    const index = ranked.findIndex(s => s.id === target.id);
+
+                    return index !== -1 ? index + 1 : "-";
                 },
             }
         }
