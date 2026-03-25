@@ -577,6 +577,16 @@
                 margin: 10mm;
             }
 
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            html, body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
             body {
                 background: white !important;
             }
@@ -631,22 +641,10 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
 
-            .bg-blue-900, .bg-blue-900\/60 {
-                background-color: #1e3a8a !important; /* solid navy */
-            }
-            .bg-blue-50, .bg-blue-50\/50 {
-                background-color: #e0f2fe !important; /* solid light blue */
-            }
-
-            /* Force navy background */
-            .navy-bg {
-                background-color: #1e3a8a !important;
-                color: white !important; /* ensure text stays visible */
-            }
-
             /* Override light text inside GPA block */
-            .text-blue-200 {
-                color: #ffffff !important; /* pure white for print */
+            .text-blue-300 {
+                color: #ffffff !important;
+                opacity: 1 !important;
             }
 
             /* Remove shadows */
@@ -654,10 +652,28 @@
                 box-shadow: none !important;
             }
 
-            /* Remove opacity from light blue overlays */
+            .bg-blue-900\/60 {
+                background-color: #1e3a8a !important;
+            }
+
             .bg-blue-50\/50 {
                 background-color: #e0f2fe !important;
             }
+
+            .navy-bg {
+                background-color: #1e3a8a !important;
+                color: white !important;
+            }
+
+            .bg-green-600 {
+                background-color: #16a34a !important;
+                color: white !important;
+            }
+
+            .bg-indigo-500 {
+                background-color: #6366f1 !important;
+                color: white !important;
+}
         }
     </style>
 </body>
